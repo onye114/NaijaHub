@@ -4,7 +4,7 @@ require "config.php";
 require "paystack-config.php";
 
 error_reporting(E_ALL);
-ini_set("display_errors", 1);
+ini_set("display_errors", 0);
 
 $message = "";
 
@@ -99,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             */
 
             $callbackUrl =
-    "https://acutely-dubiously-glitch.ngrok-free.dev/payment-callback.php";
+    "https://$callbackUrl = rtrim(APP_BASE_URL, '/') . '/payment-callback.php';/payment-callback.php";
                 
 
 
