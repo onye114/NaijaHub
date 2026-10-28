@@ -97,10 +97,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             | the browser after checkout. Paystack webhooks
             | cannot reach localhost directly.
             */
-
-            $callbackUrl =
-    "https://$callbackUrl = rtrim(APP_BASE_URL, '/') . '/payment-callback.php';/payment-callback.php";
-                
+             
+            $callbackUrl = rtrim(APP_BASE_URL, '/') . '/payment-callback.php';
 
 
             $fields = [
