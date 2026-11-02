@@ -1,7 +1,7 @@
 <?php
 
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 
 require "config.php";
 
@@ -22,14 +22,20 @@ $sql = "
         businesses.email,
         businesses.city,
         businesses.rating,
-        businesses.featured,
+        CASE
+    WHEN businesses.featured = 1
+         AND businesses.featured_until IS NOT NULL
+         AND businesses.featured_until > NOW()
+    THEN 1
+    ELSE 0
+END AS featured,
         businesses.verified,
         categories.name AS category
     FROM businesses
     INNER JOIN categories
         ON businesses.category_id = categories.id
     WHERE businesses.status = 'approved'
-    ORDER BY businesses.featured DESC, businesses.rating DESC
+    ORDER BY featured DESC, businesses.rating DESC
 ";
 
 $result = $conn->query($sql);

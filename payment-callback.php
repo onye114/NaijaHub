@@ -1,17 +1,18 @@
+
 <?php
 
-require "config.php";
-require "paystack-config.php";
+require_once "config.php";
+require_once "paystack-config.php";
 
 error_reporting(E_ALL);
 ini_set("display_errors", "0");
+ini_set("log_errors", "1");
 
 $success = false;
 $message = "";
 $businessName = "";
 
 $reference = trim($_GET["reference"] ?? "");
-
 
 /*
 |--------------------------------------------------------------------------
@@ -35,8 +36,7 @@ if ($reference === "") {
 
 } else {
 
-    $businessIdFromReference = (int)$matches[1];
-
+    $businessIdFromReference = (int) $matches[1];
 
     /*
     |--------------------------------------------------------------------------
@@ -50,200 +50,359 @@ if ($reference === "") {
 
     $ch = curl_init($url);
 
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    if ($ch === false) {
 
-    curl_setopt(
-        $ch,
-        CURLOPT_HTTPHEADER,
-        [
-            "Authorization: Bearer " . PAYSTACK_SECRET_KEY,
-            "Cache-Control: no-cache"
-        ]
-    );
-
-    $response = curl_exec($ch);
-    $curlError = curl_error($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-    curl_close($ch);
-
-
-    if ($response === false || $curlError !== "") {
-
-        $message =
-            "We could not verify the payment. Please try again.";
+        $message = "Payment verification could not be started.";
 
     } else {
 
-        $data = json_decode($response, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
+        curl_setopt(
+            $ch,
+            CURLOPT_HTTPHEADER,
+            [
+                "Authorization: Bearer " . PAYSTACK_SECRET_KEY,
+                "Cache-Control: no-cache"
+            ]
+        );
 
-        if (
-            $httpCode < 200 ||
-            $httpCode >= 300 ||
-            !is_array($data) ||
-            ($data["status"] ?? false) !== true ||
-            !isset($data["data"])
-        ) {
+        $response = curl_exec($ch);
+        $curlError = curl_error($ch);
+        $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-            $message = "Paystack could not verify this transaction.";
+        curl_close($ch);
+
+        if ($response === false || $curlError !== "") {
+
+            error_log("NaijaHub Paystack verification error: " . $curlError);
+
+            $message =
+                "We could not verify the payment. Please try again.";
 
         } else {
 
-            $transaction = $data["data"];
+            $data = json_decode($response, true);
 
-            $transactionReference =
-                (string)($transaction["reference"] ?? "");
-
-            $transactionStatus =
-                (string)($transaction["status"] ?? "");
-
-            $transactionAmount =
-                (int)($transaction["amount"] ?? 0);
-
-            $transactionCurrency =
-                (string)($transaction["currency"] ?? "");
-
-            $metadata = $transaction["metadata"] ?? [];
-
-            if (!is_array($metadata)) {
-                $metadata = [];
-            }
-
-            $businessIdFromMetadata =
-                (int)($metadata["business_id"] ?? 0);
-
-            $purpose =
-                (string)($metadata["purpose"] ?? "");
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | CHECK ALL PAYMENT DETAILS
-            |--------------------------------------------------------------------------
-            */
-
-            $validPayment =
-                hash_equals($reference, $transactionReference) &&
-                $transactionStatus === "success" &&
-                $transactionAmount === (int)PAYSTACK_FEATURED_AMOUNT &&
-                strtoupper($transactionCurrency) === "NGN" &&
-                $purpose === "NaijaHub Featured Listing" &&
-                $businessIdFromMetadata === $businessIdFromReference;
-
-
-            if (!$validPayment) {
+            if (
+                $httpCode < 200 ||
+                $httpCode >= 300 ||
+                !is_array($data) ||
+                ($data["status"] ?? false) !== true ||
+                !isset($data["data"]) ||
+                !is_array($data["data"])
+            ) {
 
                 $message =
-                    "Payment was not confirmed for this Featured Listing. "
-                    . "Check the transaction details or contact support.";
+                    "Paystack could not verify this transaction.";
 
             } else {
 
+                $transaction = $data["data"];
+
+                $transactionReference =
+                    (string) ($transaction["reference"] ?? "");
+
+                $transactionStatus =
+                    (string) ($transaction["status"] ?? "");
+
+                $transactionAmount =
+                    (int) ($transaction["amount"] ?? 0);
+
+                $transactionCurrency =
+                    (string) ($transaction["currency"] ?? "");
+
+                $metadata = $transaction["metadata"] ?? [];
+
+                if (!is_array($metadata)) {
+                    $metadata = [];
+                }
+
+                $businessIdFromMetadata =
+                    (int) ($metadata["business_id"] ?? 0);
+
+                $purpose =
+                    (string) ($metadata["purpose"] ?? "");
+
                 /*
                 |--------------------------------------------------------------------------
-                | CONFIRM THE BUSINESS IS APPROVED
+                | CHECK ALL PAYMENT DETAILS
                 |--------------------------------------------------------------------------
                 */
 
-                $check = $conn->prepare("
-                    SELECT business_name
-                    FROM businesses
-                    WHERE id = ?
-                      AND status = 'approved'
-                    LIMIT 1
-                ");
+                $validPayment =
+                    hash_equals($reference, $transactionReference) &&
+                    $transactionStatus === "success" &&
+                    $transactionAmount === (int) PAYSTACK_FEATURED_AMOUNT &&
+                    strtoupper($transactionCurrency) === "NGN" &&
+                    $purpose === "NaijaHub Featured Listing" &&
+                    $businessIdFromMetadata === $businessIdFromReference;
 
-                if (!$check) {
+                if (!$validPayment) {
 
                     $message =
-                        "We could not load the selected business.";
+                        "Payment was not confirmed for this Featured Listing. " .
+                        "Check the transaction details or contact support.";
 
                 } else {
 
-                    $check->bind_param(
-                        "i",
-                        $businessIdFromMetadata
-                    );
+                    /*
+                    |--------------------------------------------------------------------------
+                    | CONFIRM THE BUSINESS IS APPROVED
+                    |--------------------------------------------------------------------------
+                    */
 
-                    $check->execute();
+                    $check = $conn->prepare("
+                        SELECT business_name
+                        FROM businesses
+                        WHERE id = ?
+                          AND status = 'approved'
+                        LIMIT 1
+                    ");
 
-                    $businessResult = $check->get_result();
+                    if (!$check) {
 
-                    $business = $businessResult->fetch_assoc();
-
-                    $check->close();
-
-
-                    if (!$business) {
+                        error_log("NaijaHub business check preparation failed.");
 
                         $message =
-                            "The selected business was not found "
-                            . "or has not been approved.";
+                            "We could not load the selected business.";
 
                     } else {
 
-                        /*
-                        |--------------------------------------------------------------------------
-                        | ACTIVATE FEATURED STATUS
-                        |--------------------------------------------------------------------------
-                        */
+                        $check->bind_param(
+                            "i",
+                            $businessIdFromMetadata
+                        );
 
-                        $update = $conn->prepare("
-                            UPDATE businesses
-                            SET featured = 1
-                            WHERE id = ?
-                              AND status = 'approved'
-                        ");
+                        if (!$check->execute()) {
 
-                        if (!$update) {
+                            error_log("NaijaHub business check execution failed.");
 
                             $message =
-                                "Payment was verified, but the listing "
-                                . "could not be updated. Contact support.";
+                                "We could not verify the selected business.";
 
                         } else {
 
-                            $update->bind_param(
-                                "i",
-                                $businessIdFromMetadata
-                            );
+                            $businessResult = $check->get_result();
 
-                            if ($update->execute()) {
-
-                                $success = true;
-
-                                $businessName =
-                                    $business["business_name"];
+                            if (!$businessResult) {
 
                                 $message =
-                                    "Payment verified successfully. "
-                                    . "Your business is now marked as Featured.";
+                                    "We could not retrieve the business details.";
 
                             } else {
 
-                                $message =
-                                    "Payment was verified, but the listing "
-                                    . "could not be updated. Contact support.";
+                                $business = $businessResult->fetch_assoc();
 
+                                if (!$business) {
+
+                                    $message =
+                                        "The selected business was not found " .
+                                        "or has not been approved.";
+
+                                } else {
+
+                                    /*
+                                    |--------------------------------------------------------------------------
+                                    | RECORD PAYMENT AND ACTIVATE FEATURED STATUS
+                                    |--------------------------------------------------------------------------
+                                    */
+
+                                    $record = null;
+                                    $update = null;
+                                    $transactionStarted = false;
+
+                                    try {
+
+                                        /*
+                                        | Start an InnoDB transaction so the payment
+                                        | record and business update succeed together.
+                                        */
+
+                                        if (!$conn->begin_transaction()) {
+                                            throw new RuntimeException(
+                                                "Could not start database transaction."
+                                            );
+                                        }
+
+                                        $transactionStarted = true;
+
+                                        $currencyToStore =
+                                            strtoupper($transactionCurrency);
+
+                                        /*
+                                        | A UNIQUE index on paystack_reference
+                                        | prevents the same transaction being reused.
+                                        */
+
+                                        $record = $conn->prepare("
+                                            INSERT INTO featured_payment_records
+                                            (
+                                                paystack_reference,
+                                                business_id,
+                                                amount_kobo,
+                                                currency,
+                                                purpose
+                                            )
+                                            VALUES (?, ?, ?, ?, ?)
+                                        ");
+
+                                        if (!$record) {
+                                            throw new RuntimeException(
+                                                "Could not prepare payment record."
+                                            );
+                                        }
+
+                                        $record->bind_param(
+                                            "siiss",
+                                            $transactionReference,
+                                            $businessIdFromMetadata,
+                                            $transactionAmount,
+                                            $currencyToStore,
+                                            $purpose
+                                        );
+
+                                        if (!$record->execute()) {
+
+                                            if ((int) $record->errno === 1062) {
+                                                throw new RuntimeException(
+                                                    "This payment has already been processed.",
+                                                    1062
+                                                );
+                                            }
+
+                                            throw new RuntimeException(
+                                                "Could not save payment record."
+                                            );
+                                        }
+
+                                        /*
+                                        |--------------------------------------------------------------------------
+                                        | ACTIVATE OR EXTEND FEATURED LISTING
+                                        |--------------------------------------------------------------------------
+                                        |
+                                        | If the business has an active expiry date,
+                                        | add 30 days to that date.
+                                        |
+                                        | If the listing has expired or has no expiry,
+                                        | start a new 30-day period from now.
+                                        */
+
+                                        $update = $conn->prepare("
+                                            UPDATE businesses
+                                            SET featured = 1,
+                                                featured_until = DATE_ADD(
+                                                    GREATEST(
+                                                        COALESCE(featured_until, NOW()),
+                                                        NOW()
+                                                    ),
+                                                    INTERVAL 30 DAY
+                                                )
+                                            WHERE id = ?
+                                              AND status = 'approved'
+                                        ");
+
+                                        if (!$update) {
+                                            throw new RuntimeException(
+                                                "Could not prepare business update."
+                                            );
+                                        }
+
+                                        $update->bind_param(
+                                            "i",
+                                            $businessIdFromMetadata
+                                        );
+
+                                        if (!$update->execute()) {
+                                            throw new RuntimeException(
+                                                "Business update failed."
+                                            );
+                                        }
+
+                                        if ($update->affected_rows !== 1) {
+                                            throw new RuntimeException(
+                                                "No approved business was updated."
+                                            );
+                                        }
+
+                                        /*
+                                        |--------------------------------------------------------------------------
+                                        | COMMIT BOTH DATABASE CHANGES
+                                        |--------------------------------------------------------------------------
+                                        */
+
+                                        if (!$conn->commit()) {
+                                            throw new RuntimeException(
+                                                "Database transaction could not be committed."
+                                            );
+                                        }
+
+                                        $transactionStarted = false;
+
+                                        $success = true;
+
+                                        $businessName =
+                                            $business["business_name"];
+
+                                        $message =
+                                            "Payment verified successfully. " .
+                                            "Your business is now marked as Featured.";
+
+                                    } catch (Throwable $e) {
+
+                                        if ($transactionStarted) {
+
+                                            try {
+                                                $conn->rollback();
+                                            } catch (Throwable $rollbackError) {
+                                                error_log(
+                                                    "NaijaHub rollback error: " .
+                                                    $rollbackError->getMessage()
+                                                );
+                                            }
+                                        }
+
+                                        if ((int) $e->getCode() === 1062) {
+
+                                            $message =
+                                                "This payment has already been processed. " .
+                                                "Please do not pay again using the same reference. " .
+                                                "Contact support if your listing is not Featured.";
+
+                                        } else {
+
+                                            error_log(
+                                                "NaijaHub featured payment error: " .
+                                                $e->getMessage()
+                                            );
+
+                                            $message =
+                                                "Payment was verified, but the listing " .
+                                                "could not be updated. Contact support.";
+                                        }
+
+                                    } finally {
+
+                                        if ($update instanceof mysqli_stmt) {
+                                            $update->close();
+                                        }
+
+                                        if ($record instanceof mysqli_stmt) {
+                                            $record->close();
+                                        }
+                                    }
+                                }
                             }
-
-                            $update->close();
-
                         }
 
+                        $check->close();
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }
 
 ?>
@@ -252,7 +411,6 @@ if ($reference === "") {
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -260,10 +418,11 @@ if ($reference === "") {
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta name="robots" content="noindex, nofollow">
+
     <title>Payment Result — NaijaHub</title>
 
     <style>
-
         * {
             box-sizing: border-box;
         }
@@ -313,6 +472,9 @@ if ($reference === "") {
             font-weight: 700;
         }
 
+        .button:hover {
+            background: #0e713c;
+        }
     </style>
 
 </head>
@@ -328,13 +490,25 @@ if ($reference === "") {
             <h1>Payment Successful</h1>
 
             <p>
-                <?php echo htmlspecialchars($message); ?>
+                <?php
+                echo htmlspecialchars(
+                    $message,
+                    ENT_QUOTES | ENT_SUBSTITUTE,
+                    "UTF-8"
+                );
+                ?>
             </p>
 
             <p>
                 Business:
                 <strong>
-                    <?php echo htmlspecialchars($businessName); ?>
+                    <?php
+                    echo htmlspecialchars(
+                        $businessName,
+                        ENT_QUOTES | ENT_SUBSTITUTE,
+                        "UTF-8"
+                    );
+                    ?>
                 </strong>
             </p>
 
@@ -345,7 +519,13 @@ if ($reference === "") {
             <h1>Payment Result</h1>
 
             <p>
-                <?php echo htmlspecialchars($message); ?>
+                <?php
+                echo htmlspecialchars(
+                    $message,
+                    ENT_QUOTES | ENT_SUBSTITUTE,
+                    "UTF-8"
+                );
+                ?>
             </p>
 
         <?php endif; ?>
