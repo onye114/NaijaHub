@@ -1,3 +1,4 @@
+
 <?php
 
 error_reporting(E_ALL);
@@ -23,12 +24,12 @@ $sql = "
         businesses.city,
         businesses.rating,
         CASE
-    WHEN businesses.featured = 1
-         AND businesses.featured_until IS NOT NULL
-         AND businesses.featured_until > NOW()
-    THEN 1
-    ELSE 0
-END AS featured,
+            WHEN businesses.featured = 1
+                 AND businesses.featured_until IS NOT NULL
+                 AND businesses.featured_until > NOW()
+            THEN 1
+            ELSE 0
+        END AS featured,
         businesses.verified,
         categories.name AS category
     FROM businesses
@@ -51,6 +52,7 @@ if ($result) {
 $businessCount = count($businesses);
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -67,10 +69,7 @@ $businessCount = count($businesses);
 
     <title>NaijaHub — Discover Trusted Local Services & Deals</title>
 
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 
     <link
         rel="preconnect"
@@ -83,10 +82,7 @@ $businessCount = count($businesses);
         rel="stylesheet"
     >
 
-    <link
-        rel="stylesheet"
-        href="assets/style.css"
-    >
+    <link rel="stylesheet" href="assets/style.css">
 
 </head>
 
@@ -121,10 +117,7 @@ $businessCount = count($businesses);
 
     <div class="container nav">
 
-        <a
-            href="index.php"
-            class="brand"
-        >
+        <a href="index.php" class="brand">
 
             <span class="brand-icon">
                 N
@@ -139,31 +132,20 @@ $businessCount = count($businesses);
 
         <nav class="desktop-nav">
 
-            <a href="#discover">
-                Discover
-            </a>
+            <a href="#discover">Discover</a>
 
-            <a href="#categories">
-                Categories
-            </a>
+            <a href="#categories">Categories</a>
 
-            <a href="#deals">
-                Deals
-            </a>
+            <a href="#deals">Deals</a>
 
-            <a href="#how-it-works">
-                How it works
-            </a>
+            <a href="#how-it-works">How it works</a>
 
         </nav>
 
 
         <div class="nav-actions">
 
-            <a
-                href="#list-business"
-                class="btn btn-primary"
-            >
+            <a href="#list-business" class="btn btn-primary">
                 List your business
             </a>
 
@@ -180,34 +162,19 @@ $businessCount = count($businesses);
     </div>
 
 
-    <div
-        class="mobile-menu"
-        id="mobileMenu"
-    >
+    <div class="mobile-menu" id="mobileMenu">
 
-        <a href="#discover">
-            Discover
-        </a>
+        <a href="#discover">Discover</a>
 
-        <a href="#categories">
-            Categories
-        </a>
+        <a href="#categories">Categories</a>
 
-        <a href="#deals">
-            Deals
-        </a>
+        <a href="#deals">Deals</a>
 
-        <a href="featured.php">
-    Featured
-</a>
+        <a href="featured.php">Featured</a>
 
-        <a href="#how-it-works">
-            How it works
-        </a>
+        <a href="#how-it-works">How it works</a>
 
-        <a href="#list-business">
-            List your business
-        </a>
+        <a href="#list-business">List your business</a>
 
     </div>
 
@@ -219,7 +186,6 @@ $businessCount = count($businesses);
 <section class="hero">
 
     <div class="container hero-wrap">
-
 
         <div class="hero-copy">
 
@@ -285,21 +251,15 @@ $businessCount = count($businesses);
                             Anywhere in Nigeria
                         </option>
 
-                        <option value="Lagos">
-                            Lagos
-                        </option>
+                        <option value="Lagos">Lagos</option>
 
-                        <option value="Abuja">
-                            Abuja
-                        </option>
+                        <option value="Abuja">Abuja</option>
 
                         <option value="Port Harcourt">
                             Port Harcourt
                         </option>
 
-                        <option value="Ibadan">
-                            Ibadan
-                        </option>
+                        <option value="Ibadan">Ibadan</option>
 
                     </select>
 
@@ -319,35 +279,21 @@ $businessCount = count($businesses);
 
             <div class="popular-searches">
 
-                <span>
-                    Popular:
-                </span>
+                <span>Popular:</span>
 
-                <button
-                    type="button"
-                    data-search="technology"
-                >
+                <button type="button" data-search="technology">
                     Web Design
                 </button>
 
-                <button
-                    type="button"
-                    data-search="food"
-                >
+                <button type="button" data-search="food">
                     Restaurants
                 </button>
 
-                <button
-                    type="button"
-                    data-search="events"
-                >
+                <button type="button" data-search="events">
                     Photography
                 </button>
 
-                <button
-                    type="button"
-                    data-search="home"
-                >
+                <button type="button" data-search="home">
                     Home Services
                 </button>
 
@@ -399,13 +345,9 @@ $businessCount = count($businesses);
 
                     <div>
 
-                        <strong>
-                            Verified businesses
-                        </strong>
+                        <strong>Verified businesses</strong>
 
-                        <small>
-                            Local listings
-                        </small>
+                        <small>Local listings</small>
 
                     </div>
 
@@ -420,13 +362,9 @@ $businessCount = count($businesses);
 
                     <div>
 
-                        <strong>
-                            Top-rated services
-                        </strong>
+                        <strong>Top-rated services</strong>
 
-                        <small>
-                            Customer favourites
-                        </small>
+                        <small>Customer favourites</small>
 
                     </div>
 
@@ -439,13 +377,9 @@ $businessCount = count($businesses);
 
                     <div>
 
-                        <strong>
-                            Lagos, Nigeria
-                        </strong>
+                        <strong>Lagos, Nigeria</strong>
 
-                        <small>
-                            Discover something nearby
-                        </small>
+                        <small>Discover something nearby</small>
 
                     </div>
 
@@ -472,48 +406,34 @@ $businessCount = count($businesses);
                 <?php echo $businessCount; ?>
             </strong>
 
-            <span>
-                Listed Businesses
-            </span>
+            <span>Listed Businesses</span>
 
         </div>
 
 
         <div>
 
-            <strong>
-                6
-            </strong>
+            <strong>6</strong>
 
-            <span>
-                Main Categories
-            </span>
+            <span>Main Categories</span>
 
         </div>
 
 
         <div>
 
-            <strong>
-                4
-            </strong>
+            <strong>4</strong>
 
-            <span>
-                Sample Cities
-            </span>
+            <span>Sample Cities</span>
 
         </div>
 
 
         <div>
 
-            <strong>
-                4.8/5
-            </strong>
+            <strong>4.8/5</strong>
 
-            <span>
-                Demo Average Rating
-            </span>
+            <span>Demo Average Rating</span>
 
         </div>
 
@@ -524,13 +444,9 @@ $businessCount = count($businesses);
 
 <!-- CATEGORIES -->
 
-<section
-    class="section"
-    id="categories"
->
+<section class="section" id="categories">
 
     <div class="container">
-
 
         <div class="section-header">
 
@@ -547,10 +463,7 @@ $businessCount = count($businesses);
             </div>
 
 
-            <a
-                href="#discover"
-                class="arrow-link"
-            >
+            <a href="#discover" class="arrow-link">
                 Explore all →
             </a>
 
@@ -559,24 +472,17 @@ $businessCount = count($businesses);
 
         <div class="category-grid">
 
-
             <button
                 class="category-tile"
                 type="button"
                 data-category="technology"
             >
 
-                <span class="tile-icon purple">
-                    ⌘
-                </span>
+                <span class="tile-icon purple">⌘</span>
 
-                <strong>
-                    Technology
-                </strong>
+                <strong>Technology</strong>
 
-                <small>
-                    Web, software & repairs
-                </small>
+                <small>Web, software & repairs</small>
 
             </button>
 
@@ -587,17 +493,11 @@ $businessCount = count($businesses);
                 data-category="food"
             >
 
-                <span class="tile-icon orange">
-                    ●
-                </span>
+                <span class="tile-icon orange">●</span>
 
-                <strong>
-                    Food & Restaurants
-                </strong>
+                <strong>Food & Restaurants</strong>
 
-                <small>
-                    Meals, catering & delivery
-                </small>
+                <small>Meals, catering & delivery</small>
 
             </button>
 
@@ -608,17 +508,11 @@ $businessCount = count($businesses);
                 data-category="beauty"
             >
 
-                <span class="tile-icon pink">
-                    ✦
-                </span>
+                <span class="tile-icon pink">✦</span>
 
-                <strong>
-                    Beauty & Wellness
-                </strong>
+                <strong>Beauty & Wellness</strong>
 
-                <small>
-                    Salons, spa & makeup
-                </small>
+                <small>Salons, spa & makeup</small>
 
             </button>
 
@@ -629,17 +523,11 @@ $businessCount = count($businesses);
                 data-category="home services"
             >
 
-                <span class="tile-icon blue">
-                    ⌂
-                </span>
+                <span class="tile-icon blue">⌂</span>
 
-                <strong>
-                    Home Services
-                </strong>
+                <strong>Home Services</strong>
 
-                <small>
-                    Cleaning, plumbing & repairs
-                </small>
+                <small>Cleaning, plumbing & repairs</small>
 
             </button>
 
@@ -650,17 +538,11 @@ $businessCount = count($businesses);
                 data-category="events"
             >
 
-                <span class="tile-icon yellow">
-                    ◆
-                </span>
+                <span class="tile-icon yellow">◆</span>
 
-                <strong>
-                    Events & Media
-                </strong>
+                <strong>Events & Media</strong>
 
-                <small>
-                    Photography & vendors
-                </small>
+                <small>Photography & vendors</small>
 
             </button>
 
@@ -671,20 +553,13 @@ $businessCount = count($businesses);
                 data-category="education"
             >
 
-                <span class="tile-icon teal">
-                    ▣
-                </span>
+                <span class="tile-icon teal">▣</span>
 
-                <strong>
-                    Education
-                </strong>
+                <strong>Education</strong>
 
-                <small>
-                    Tutors & training
-                </small>
+                <small>Tutors & training</small>
 
             </button>
-
 
         </div>
 
@@ -695,13 +570,9 @@ $businessCount = count($businesses);
 
 <!-- BUSINESSES -->
 
-<section
-    class="section section-light"
-    id="discover"
->
+<section class="section section-light" id="discover">
 
     <div class="container">
-
 
         <div class="section-header">
 
@@ -711,9 +582,7 @@ $businessCount = count($businesses);
                     DISCOVER
                 </span>
 
-                <h2>
-                    Popular businesses
-                </h2>
+                <h2>Popular businesses</h2>
 
                 <p class="section-description">
                     Businesses currently loaded from your MySQL database.
@@ -745,13 +614,9 @@ $businessCount = count($businesses);
         </div>
 
 
-        <div
-            class="listings-grid"
-            id="listingGrid"
-        >
+        <div class="listings-grid" id="listingGrid">
 
             <?php if ($businessCount > 0): ?>
-
 
                 <?php foreach ($businesses as $business): ?>
 
@@ -898,9 +763,7 @@ $businessCount = count($businesses);
                         ⌕
                     </div>
 
-                    <h3>
-                        No businesses yet
-                    </h3>
+                    <h3>No businesses yet</h3>
 
                     <p>
                         Approved businesses will appear here.
@@ -920,13 +783,9 @@ $businessCount = count($businesses);
 
 <!-- DEALS -->
 
-<section
-    class="section deals-section"
-    id="deals"
->
+<section class="section deals-section" id="deals">
 
     <div class="container">
-
 
         <div class="deal-banner">
 
@@ -971,13 +830,9 @@ $businessCount = count($businesses);
 
                 <div class="deal-body">
 
-                    <small>
-                        Food
-                    </small>
+                    <small>Food</small>
 
-                    <h3>
-                        Weekend family meal deal
-                    </h3>
+                    <h3>Weekend family meal deal</h3>
 
                     <p>
                         Deals system will be connected to MySQL next.
@@ -1000,13 +855,9 @@ $businessCount = count($businesses);
 
                 <div class="deal-body">
 
-                    <small>
-                        Technology
-                    </small>
+                    <small>Technology</small>
 
-                    <h3>
-                        Business website package
-                    </h3>
+                    <h3>Business website package</h3>
 
                     <p>
                         Businesses will be able to create real promotions.
@@ -1029,13 +880,9 @@ $businessCount = count($businesses);
 
                 <div class="deal-body">
 
-                    <small>
-                        Beauty
-                    </small>
+                    <small>Beauty</small>
 
-                    <h3>
-                        Weekend beauty package
-                    </h3>
+                    <h3>Weekend beauty package</h3>
 
                     <p>
                         Paid and free promotional deals will be supported.
@@ -1055,13 +902,9 @@ $businessCount = count($businesses);
 
 <!-- HOW IT WORKS -->
 
-<section
-    class="section"
-    id="how-it-works"
->
+<section class="section" id="how-it-works">
 
     <div class="container">
-
 
         <div class="center-heading">
 
@@ -1087,13 +930,9 @@ $businessCount = count($businesses);
 
             <article class="step-card">
 
-                <span class="step-number">
-                    01
-                </span>
+                <span class="step-number">01</span>
 
-                <h3>
-                    Search
-                </h3>
+                <h3>Search</h3>
 
                 <p>
                     Tell us what service you need
@@ -1105,13 +944,9 @@ $businessCount = count($businesses);
 
             <article class="step-card">
 
-                <span class="step-number">
-                    02
-                </span>
+                <span class="step-number">02</span>
 
-                <h3>
-                    Compare
-                </h3>
+                <h3>Compare</h3>
 
                 <p>
                     Check categories, ratings,
@@ -1123,13 +958,9 @@ $businessCount = count($businesses);
 
             <article class="step-card">
 
-                <span class="step-number">
-                    03
-                </span>
+                <span class="step-number">03</span>
 
-                <h3>
-                    Connect
-                </h3>
+                <h3>Connect</h3>
 
                 <p>
                     Contact the business and
@@ -1148,10 +979,7 @@ $businessCount = count($businesses);
 
 <!-- BUSINESS CTA -->
 
-<section
-    class="section business-cta"
-    id="list-business"
->
+<section class="section business-cta" id="list-business">
 
     <div class="container business-cta-inner">
 
@@ -1188,12 +1016,14 @@ $businessCount = count($businesses);
 </section>
 
 
-<!-- FOOTER -->
+<!-- NAIJAHUB FOOTER -->
 
 <footer class="footer">
 
     <div class="container footer-top">
 
+
+        <!-- BRAND -->
 
         <div class="footer-brand">
 
@@ -1221,6 +1051,8 @@ $businessCount = count($businesses);
         </div>
 
 
+        <!-- EXPLORE -->
+
         <div class="footer-col">
 
             <strong>
@@ -1242,11 +1074,21 @@ $businessCount = count($businesses);
         </div>
 
 
+        <!-- COMPANY -->
+
         <div class="footer-col">
 
             <strong>
-                For businesses
+                Company
             </strong>
+
+            <a href="about.php">
+                About Us
+            </a>
+
+            <a href="contact.php">
+                Contact Us
+            </a>
 
             <a href="#list-business">
                 List your business
@@ -1259,14 +1101,24 @@ $businessCount = count($businesses);
         </div>
 
 
+        <!-- LEGAL AND CONTACT -->
+
         <div class="footer-col">
 
             <strong>
-                Contact
+                Legal &amp; Contact
             </strong>
 
+            <a href="privacy.php">
+                Privacy Policy
+            </a>
+
+            <a href="terms.php">
+                Terms &amp; Conditions
+            </a>
+
             <a href="mailto:onyekachristian4321@gmail.com">
-                onyekachristian4321@gmail.com
+                Email NaijaHub
             </a>
 
             <span>
@@ -1279,10 +1131,12 @@ $businessCount = count($businesses);
     </div>
 
 
+    <!-- COPYRIGHT -->
+
     <div class="container footer-bottom">
 
         <span>
-            © 2026 NaijaHub. All rights reserved.
+            &copy; <?= date('Y') ?> NaijaHub. All rights reserved.
         </span>
 
         <span>
